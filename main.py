@@ -36,16 +36,21 @@ def generate_fips_mapping():
 
     zip_fips_data.to_csv('zip_fips_data.csv', index=False)
 
-    zip_fips_mapping = {}
+    zip_fips_list = []
     for index, row in zip_fips_data.iterrows():
-        zip_fips_mapping[row['zip']] = {
-            'fips': row['fips'],
-            'county_name': row['county_name'],
-            'state_abbreviation': row['state_abbreviation']
-        }
+        fips_padded = str(row['fips']).zfill(6)
+        zip_fips_list.append({
+            '_id': f"{row['zip']}-{fips_padded}",
+            'zipCode': row['zip'],
+            'countyFips': fips_padded,
+            'cityName': row['county_name'],
+            'state': row['state_abbreviation']
+        })
 
     with open('zip_fips_mapping.json', 'w') as outfile:
-        json.dump(zip_fips_mapping, outfile)
+        for item in zip_fips_list:
+            json.dump(item, outfile)
+            outfile.write('\n')
 
 if __name__ == '__main__':
     generate_fips_mapping()
